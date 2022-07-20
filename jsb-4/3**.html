@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en" class="html">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 3**</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .html,
+        .body {
+            width: 100%;
+            height: 100%;
+        }
+
+        .body {
+            display: flex;
+            flex-flow: column nowrap;
+            align-content: center;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form__text-input {
+            margin: 8px;
+            width: 100%;
+        }
+
+        .form__start {
+            margin: 8px;
+            width: 100%;
+            background-color: yellow;
+        }
+
+        .test__container {
+            margin-top: 64px;
+            display: flex;
+            flex-flow: row wrap;
+            gap: 32px;
+        }
+
+        .test__item {
+            padding: 16px;
+            height: 160px;
+            border-radius: 20px;
+            border: 1px solid black;
+            
+        }
+        
+        .test__progress {
+            margin-top: 16px;
+            height: 35px;
+            width: 100%;
+            border: 1px solid black;
+        }
+
+        .test__result {
+            margin-top: 32px;
+            width: 100%;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body class="body">
+    <section>
+        <form onsubmit="return false;">
+            <input type="text" class="form__text-input" value="some text 1">
+            <div>
+                <div>
+                    <input type="text" class="form__text-input" value="some text 2">
+                </div>
+                <input type="text" class="form__text-input" value="some text 3">
+            </div>
+            <div>
+                <input type="text" class="form__text-input" value="some text 4">
+            </div>
+            <div>
+                <div>
+                    <div>
+                        <div>
+                            <div>
+                                <div>
+                                    <button class="form__start">Start tests</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <section>
+        <div class="test__container">
+            <div class="test__item">
+                <h2>getAllTextInputsFromElements</h2>
+                <div class="test__progress test__progress_first"></div>
+                <p class="test__result test__result_first">Результат:</p>
+            </div>
+            <div class="test__item">
+                <h2>getAllTextInputsFromQuery</h2>
+                <div class="test__progress test__progress_second"></div>
+                <p class="test__result test__result_second">Результат:</p>
+            </div>
+            <div class="test__item">
+                <h2>getAllTextInputsRecursive</h2>
+                <div class="test__progress test__progress_third"></div>
+                <p class="test__result test__result_third">Результат:</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const startButton = document.querySelector(".form__start");
+
+        const progressFirst = document.querySelector(".test__progress_first");
+        const progressSecond = document.querySelector(".test__progress_second");
+        const progressThird = document.querySelector(".test__progress_third");
+
+        const resultFirst = document.querySelector(".test__result_first")
+        const resultSecond = document.querySelector(".test__result_second")
+        const resultThird = document.querySelector(".test__result_third")
+
+        const cycles = 1000;
+        const innerCycles = 1000;
+
+
+        function findParentTag(node, tagName) {
+            while (node) {
+                if (node.tagName === tagName) {
+                    return node;
+                }
+                node = node.parentElement;
+            }
+            return null;
+        }
+
+        function getAllTextInputsFromElements(form) {
+
+            let result = []
+
+            for (const element of form.elements) {
+                if (element.type === "text" && !element.classList.contains("form__text-output")) {
+                    result.push(element.value);
+                }
+            }
+
+            return result.join("; ");
+        }
+
+        function getAllTextInputsFromQuery(form) {
+
+            const textInputs = form.querySelectorAll(".form__text-input");
+            
+            let result = [];
+            
+            for (const input of textInputs) {
+                result.push(input.value);
+            }
+
+            return result.join("; ");
+        }
+
+        function findChildrensRecursive(root, tagName, tagType) {
+            
+            if (!root) {
+                return [];
+            }
+
+            let result = [];
+
+            for (const child of root.childNodes) {
+
+                result = result.concat(findChildrensRecursive(child, tagName, tagType));
+
+                if (child.tagName === tagName && child.type === tagType) {
+                    result.push(child);
+                }
+            }
+
+            return result;
+        }
+
+        function getAllTextInputsRecursive(form) {
+
+            let result = [];
+
+            findChildrensRecursive(form, "INPUT", "text").forEach((input) => {
+                if (!input.classList.contains("form__text-output")) {
+                    result.push(input.value);
+                }
+            });
+            
+            return result.join("; ");
+        }
+
+        function prepareProgress(progress) {
+            progress.style.backgroundColor = "black";
+        }
+
+        let globalID = undefined;
+        let globalCounter = 0;
+
+        function inrevalHandler(func, progress, form) {
+
+            for (let i=0; i<innerCycles; i++) {
+                func(form);
+            }
+
+            globalCounter++;
+            progress.style.width = `${100 * globalCounter / cycles}%`;
+            if (globalCounter > cycles) {
+                clearInterval(globalID);
+                globalID = undefined;
+                globalCounter = 0;
+            }
+        }
+        
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        async function testAsyncHandler(func, progress, result, form) {
+            prepareProgress(progress);
+            let start = Date.now();
+            globalID = setInterval(inrevalHandler, 0.1, func, progress, form);
+            while (globalID !== undefined) { await sleep(500); }
+            result.textContent = Date.now() - start;
+        }
+
+        startButton.onclick = async function() {
+            const form = findParentTag(startButton, "FORM");
+            if (!form) return;
+
+            startButton.disabled = true;
+
+            await testAsyncHandler(getAllTextInputsFromElements, progressFirst, resultFirst, form);
+            await testAsyncHandler(getAllTextInputsFromQuery, progressSecond, resultSecond, form);
+            await testAsyncHandler(getAllTextInputsRecursive, progressThird, resultThird, form);
+
+            startButton.disabled = false;
+        }
+    </script>
+
+</body>
+</html>

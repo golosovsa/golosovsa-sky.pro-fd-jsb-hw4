@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" class="html">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 3* v3</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .html,
+        .body {
+            width: 100%;
+            height: 100%;
+        }
+
+        .body {
+            display: flex;
+            flex-flow: column nowrap;
+            align-content: center;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form__text-input {
+            margin: 8px;
+        }
+
+        .form__text-output {
+            margin: 8px;
+            background-color: yellow;
+        }
+
+    </style>
+</head>
+<body class="body">
+    <section>
+        <form action="">
+            <input type="text" class="form__text-input" value="some text 1">
+            <div>
+                <div>
+                    <input type="text" class="form__text-input" value="some text 2">
+                </div>
+                <input type="text" class="form__text-input" value="some text 3">
+            </div>
+            <div>
+                <input type="text" class="form__text-input" value="some text 4">
+            </div>
+            <div>
+                <div>
+                    <div>
+                        <div>
+                            <div>
+                                <div>
+                                    <input type="text" class="form__text-output">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <script>
+        textOutput = document.querySelector(".form__text-output");
+
+        function findParentTag(node, tagName) {
+            while (node) {
+                if (node.tagName === tagName) {
+                    return node;
+                }
+                node = node.parentElement;
+            }
+            return null;
+        }
+
+        function findChildrensRecursive(root, tagName, tagType) {
+            
+            if (!root) {
+                return [];
+            }
+
+            let result = [];
+
+            for (const child of root.childNodes) {
+
+                result = result.concat(findChildrensRecursive(child, tagName, tagType));
+
+                if (child.tagName === tagName && child.type === tagType) {
+                    result.push(child);
+                }
+            }
+
+            return result;
+        }
+
+        function getAllTextInputsRecursive(form) {
+
+            let result = [];
+
+            findChildrensRecursive(form, "INPUT", "text").forEach((input) => {
+                if (!input.classList.contains("form__text-output")) {
+                    result.push(input.value);
+                }
+            });
+            
+            return result.join("; ");
+        }
+
+        textOutput.onclick = function() {
+            const form = findParentTag(textOutput, "FORM");
+            if (!form) return;
+            
+            textOutput.value = getAllTextInputsRecursive(form);
+        }
+    </script>
+
+</body>
+</html>

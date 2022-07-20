@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru" class="html">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .html,
+        .body {
+            width: 100%;
+            height: 100%;
+        }
+
+        .body {
+            display: flex;
+            flex-flow: column nowrap;
+            align-content: center;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form__text-input {
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+
+        .form__btn-back {
+            display: block;
+            width: 100%;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body class="body">
+    <section>
+        <div>
+            <div>
+                <input type="text" name="" class="form__text-input">
+            </div>
+            <div>
+                <div>
+                    <div>
+                        <input type="text" name="" class="form__text-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="text" name="" class="form__text-input">
+        <button class="form__btn-back">Назад</button>
+    </section>
+
+    <script>
+        const textInputs = document.querySelectorAll(".form__text-input");
+        const btnBack = document.querySelector(".form__btn-back");
+
+        btnBack.onclick = function() {
+
+            for (const textInput of textInputs) {
+                if (textInput.value.trim().toLowerCase() !== "пожалуйста") {
+                    return;
+                }
+            }
+
+            history.back();
+        }
+    </script>
+    
+</body>
+</html>
